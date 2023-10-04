@@ -1,0 +1,94 @@
+import 'package:flutter/material.dart';
+import 'dart:async';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Stopwatch App',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      debugShowCheckedModeBanner: false,
+      home: StopwatchScreen(),
+    );
+  }
+}
+
+class StopwatchScreen extends StatefulWidget {
+  @override
+  _StopwatchScreenState createState() => _StopwatchScreenState();
+}
+
+class _StopwatchScreenState extends State<StopwatchScreen> {
+  Stopwatch _stopwatch = Stopwatch();
+  String _stopwatchText = '00:00:00';
+
+  void _startStopwatch() {
+    _stopwatch.start();
+    Timer.periodic(Duration(milliseconds: 100), (timer) {
+      _updateStopwatch(timer);
+    });
+  }
+
+  void _stopStopwatch() {
+    _stopwatch.stop();
+  }
+
+  void _resetStopwatch() {
+    _stopwatch.reset();
+    setState(() {
+      _stopwatchText = '00:00:00';
+    });
+  }
+
+  void _updateStopwatch(Timer timer) {
+    if (_stopwatch.isRunning) {
+      setState(() {
+        _stopwatchText = _formatDuration(_stopwatch.elapsed);
+      });
+    }
+  }
+
+  String _formatDuration(Duration duration) {
+    return '${duration.inHours.toString().padLeft(2, '0')}:${(duration.inMinutes % 60).toString().padLeft(2, '0')}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.teal,
+        title: Center(child: Text('Stopwatch App')),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              _stopwatchText,
+              style: TextStyle(fontSize: 48),
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                ElevatedButton(
+                  onPressed: _stopwatch.isRunning ? _stopStopwatch : _startStopwatch,
+                  child: Text(_stopwatch.isRunning ? 'Stop' : 'Start'),
+                ),
+                SizedBox(width: 20),
+                ElevatedButton(
+                  onPressed: _resetStopwatch,
+                  child: Text('Reset'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
